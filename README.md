@@ -1,11 +1,30 @@
-An empty Haxe/Neko project, to get started quickly.
+# AsyncTools
 
-A common first usage setup after cloning the repo:
+A Haxe implementation of [Async](https://github.com/caolan/async). The most important parts are working:
 
+- aEach, aEachSeries, aEachLimit
+- aMap, aMapSeries, aMapLimit
+- aFilter, aFilterSeries, aFilterLimit
+
+Also includes a slightly modified version of the `@async` feature in [haxe-js-kit](https://github.com/clemos/haxe-js-kit#asynchronous-programming-experimental)
+
+The change is that you can do this: 
+
+```haxe
+function anAsyncMethod(done : Error -> Void) : Void {
+	var err = @async(err => done) some.otherAsync();
+
+	// ...
+}
 ```
-renameproject my-project-name
-haxe my-project-name.hxml
-neko bin/my-project-name.n
-```
 
-`renameproject.bat` which is used to rename the project uses `fnr.exe` which is a rather large .exe file, they are both deleted after renaming. A nice contribution would be to make a Haxe file that does the same.
+Which will add an if statement directly after the call:
+
+```haxe
+function anAsyncMethod(done : Error -> Void) : Void {
+	var err = @async(err => done) some.otherAsync();
+	if(err != null) return done(err);
+
+	// ...
+}
+```
