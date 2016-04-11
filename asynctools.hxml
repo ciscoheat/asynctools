@@ -1,0 +1,39 @@
+-lib buddy
+-cp src 
+-cp tests
+-main Tests
+-dce full
+-D asynctoolstest
+
+--each
+-cs bin
+-dce std
+
+--next
+-D multithreaded
+-java bin
+-dce std
+
+--next
+-D multithreaded
+-neko bin/neko.n
+
+--next
+-D multithreaded
+-lib hxcpp
+-cpp bin
+
+--next
+-python bin/python.py
+
+--next
+-php bin
+
+--next
+-D nodejs
+-js bin/nodejs.js
+
+--next
+#-D fdb-ci
+#-D reporter=buddy.reporting.TraceReporter
+-swf bin/flash.swf
