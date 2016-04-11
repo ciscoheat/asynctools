@@ -35,7 +35,7 @@ class AsyncDelay
 		#elseif (js || flash)
 		Timer.delay(function() done(), ms);
 		#elseif cs
-		var t = new Timer(Math.max(ms, 1));
+		var t = new Timer(Std.int(Math.max(ms, 1)));
 		t.add_Elapsed(new ElapsedEventHandler(function(sender : Dynamic, e : ElapsedEventArgs) {
 			t.Stop(); t = null;
 			done();
@@ -46,7 +46,7 @@ class AsyncDelay
 		var call = new AsyncCallable(function() {
 			executor.shutdown(); executor = null;
 			done();
-		}, ms);
+		}, Std.int(Math.max(ms, 1)));
 		executor.execute(new FutureTask(call));
 		#elseif php
 		Sys.sleep(ms / 1000);

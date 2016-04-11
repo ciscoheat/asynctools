@@ -20,8 +20,16 @@ class Tests extends BuddySuite implements Buddy <[Tests]> implements Async
 	function sleep(delayMs : Int, char : String, limit : Int, done : String -> String -> Void) : Void {
 		#if multithreaded mutex.acquire(); #end
 		running++;
-		if (limit > 0 && running > limit) done("Exceeded limit: " + running, null);
-		else if (delayMs == -1) done('Error: $char', null);
+		if (limit > 0 && running > limit) {
+			#if multithreaded mutex.release(); #end		
+			done("Exceeded limit: " + running, null);
+		}
+		else if (delayMs == -1) {
+			#if multithreaded mutex.release(); #end
+			trace("Upcoming error: " + char);
+			done('Error: $char', null);
+			trace("Errored");
+		}
 		else {
 			#if multithreaded mutex.release(); #end		
 			
@@ -73,7 +81,7 @@ class Tests extends BuddySuite implements Buddy <[Tests]> implements Async
 					}, asyncDone.bind(_, _, done));						
 				});
 				
-				@include it("should fail immediately if an error", function(done) {
+				it("should fail immediately if an error", function(done) {
 					AsyncTools.aMapLimit(chars, 6, function(char, done) {
 						var delay = switch char {
 							case "A": 100;

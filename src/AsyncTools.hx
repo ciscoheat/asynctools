@@ -6,7 +6,8 @@ import neko.vm.Mutex;
 #elseif cpp
 import cpp.vm.Mutex;
 #elseif java
-import java.vm.Mutex;
+// Had some problems with the Mutex for java.
+//import java.vm.Mutex;
 #end
 // Python is next
 #end
@@ -167,23 +168,27 @@ class AsyncTools
 				#if asynctoolstest trace('NEXT "' + nextItem + '" - currentPos: $currentPos, running: $running'); #end
 				
 				cb(nextItem, currentPos, function(err, mapped) {
+					#if asynctoolstest trace('nextItem done. Err: $err, mapped: $mapped'); #end
 					#if multithreaded mutex.acquire(); #end
 					if (completed) {
-						#if multithreaded mutex.release(); #end
 						#if asynctoolstest trace("Inner completed"); #end
+						#if multithreaded mutex.release(); #end
 					}
 					else if (err != null) {
 						if (!completed) {
+							#if asynctoolstest trace("I AM ERROR"); #end
 							completed = true;
 							#if multithreaded mutex.release(); #end
-							#if asynctoolstest trace("I AM ERROR"); #end
 							done(err, completedItems());
+						} else {
+							#if asynctoolstest trace("Race condition - completed already"); #end
+							#if multithreaded mutex.release(); #end
 						}
 					} else {
+						#if asynctoolstest trace('Item "$nextItem" done, set to $currentPos, going to next.'); #end
 						running--;
 						complete.set(currentPos, mapped);
 						#if multithreaded mutex.release(); #end
-						#if asynctoolstest trace('Item "$nextItem" done, set to $currentPos, going to next.'); #end
 						next();
 					}
 				});
