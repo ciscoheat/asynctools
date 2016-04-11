@@ -11,10 +11,11 @@ Also includes a slightly modified version of the `@async` feature in [haxe-js-ki
 The change is that you can do this: 
 
 ```haxe
-function anAsyncMethod(done : Error -> Void) : Void {
-	var err = @async(err => done) some.otherAsync();
-
-	// ...
+class YourClass implements Async {
+	function anAsyncMethod(done : Error -> Void) : Void {
+		var err = @async(err => done) some.otherAsync();
+		// ...
+	}
 }
 ```
 
@@ -24,7 +25,14 @@ Which will add an if statement directly after the call:
 function anAsyncMethod(done : Error -> Void) : Void {
 	var err = @async(err => done) some.otherAsync();
 	if(err != null) return done(err);
-
 	// ...
 }
 ```
+
+## Installing and using
+
+`haxelib install asynctools`
+
+`using AsyncTools` 
+
+`class YourClass implements Async`
